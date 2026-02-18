@@ -1,0 +1,7 @@
+{
+  "cloud_url": "http://localhost:3000",
+  "email": "",
+  "password": "",
+  "workspace": "./workspace",
+  "memory_file": "MEMORY.md"
+}
