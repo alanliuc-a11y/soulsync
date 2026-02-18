@@ -37,8 +37,22 @@ function initializeDatabase() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    CREATE TABLE IF NOT EXISTS profiles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      file_path TEXT NOT NULL,
+      content TEXT NOT NULL,
+      version INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, file_path),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_memories_user_id ON memories(user_id);
     CREATE INDEX IF NOT EXISTS idx_connections_user_id ON connections(user_id);
+    CREATE INDEX IF NOT EXISTS idx_profiles_user_id ON profiles(user_id);
+    CREATE INDEX IF NOT EXISTS idx_profiles_file_path ON profiles(file_path);
   `);
 }
 
@@ -128,6 +142,43 @@ function getConnectionsByUserId(userId) {
   return db.prepare('SELECT * FROM connections WHERE user_id = ?').all(userId);
 }
 
+function getProfilesByUserId(userId) {
+  return db.prepare('SELECT * FROM profiles WHERE user_id = ?').all(userId);
+}
+
+function getProfileByUserIdAndPath(userId, filePath) {
+  return db.prepare('SELECT * FROM profiles WHERE user_id = ? AND file_path = ?').get(userId, filePath);
+}
+
+function createOrUpdateProfile(userId, filePath, content, version) {
+  const existing = getProfileByUserIdAndPath(userId, filePath);
+  
+  if (existing) {
+    if (version !== existing.version) {
+      return { conflict: true, existing };
+    }
+    const newVersion = existing.version + 1;
+    const stmt = db.prepare(`
+      UPDATE profiles SET content = ?, version = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `);
+    stmt.run(content, newVersion, existing.id);
+    return { conflict: false, ...existing, content, version: newVersion };
+  } else {
+    const stmt = db.prepare(`
+      INSERT INTO profiles (user_id, file_path, content, version) VALUES (?, ?, ?, 1)
+    `);
+    const result = stmt.run(userId, filePath, content);
+    return { conflict: false, id: result.lastInsertRowid, user_id: userId, file_path: filePath, content, version: 1 };
+  }
+}
+
+function getProfilesUpdatedAfter(userId, since) {
+  if (!since || since === '0') {
+    return db.prepare('SELECT * FROM profiles WHERE user_id = ? ORDER BY updated_at ASC').all(userId);
+  }
+  return db.prepare('SELECT * FROM profiles WHERE user_id = ? AND updated_at > ? ORDER BY updated_at ASC').all(userId, since);
+}
+
 module.exports = {
   db,
   initializeDatabase,
@@ -143,5 +194,9 @@ module.exports = {
   createOrUpdateMemory,
   addConnection,
   removeConnection,
-  getConnectionsByUserId
+  getConnectionsByUserId,
+  getProfilesByUserId,
+  getProfileByUserIdAndPath,
+  createOrUpdateProfile,
+  getProfilesUpdatedAfter
 };

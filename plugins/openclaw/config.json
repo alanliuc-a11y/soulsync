@@ -3,5 +3,15 @@
   "email": "",
   "password": "",
   "workspace": "./workspace",
-  "memory_file": "MEMORY.md"
+  "memory_file": "MEMORY.md",
+  "watch_files": [
+    "SOUL.md",
+    "IDENTITY.md",
+    "USER.md",
+    "AGENTS.md",
+    "TOOLS.md",
+    "skills.json",
+    "memory/",
+    "MEMORY.md"
+  ]
 }

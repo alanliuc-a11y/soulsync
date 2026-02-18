@@ -7,6 +7,7 @@ const db = require('./database');
 const authMiddleware = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const memoriesRoutes = require('./routes/memories');
+const profilesRoutes = require('./routes/profiles');
 const { initializeWebSocket, getWebSocketServer } = require('./websocket');
 
 const app = express();
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/memories', memoriesRoutes);
+app.use('/api/profiles', profilesRoutes);
 
 initializeWebSocket(server);
 

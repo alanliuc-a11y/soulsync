@@ -2,13 +2,14 @@ import json
 import os
 import sys
 import time
-import signal
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'base'))
 
 from src.client import OpenClawClient
-from src.watcher import OpenClawWatcher
-from src.sync import OpenClawSync
+from src.watcher import OpenClawMultiWatcher
+from src.version_manager import VersionManager
+from src.profiles import ProfilesClient
+from src.sync import ProfileSync
 
 
 class SoulSyncPlugin:
@@ -17,13 +18,15 @@ class SoulSyncPlugin:
     def __init__(self):
         self.config = None
         self.client = None
+        self.profiles_client = None
         self.watcher = None
-        self.sync = None
+        self.version_manager = None
+        self.profile_sync = None
         self.running = False
     
     def load_config(self):
         """加载配置文件"""
-        config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+        config_path = os.path.join(os.path.dirname(__file__), '..', 'config.json')
         
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Config file not found: {config_path}")
@@ -32,18 +35,17 @@ class SoulSyncPlugin:
             self.config = json.load(f)
         
         workspace = self.config.get('workspace', './workspace')
-        workspace = os.path.abspath(os.path.join(os.path.dirname(__file__), workspace))
+        workspace = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', workspace))
         
-        memory_file = self.config.get('memory_file', 'MEMORY.md')
-        self.memory_file_path = os.path.join(workspace, memory_file)
+        watch_files = self.config.get('watch_files', ['MEMORY.md', 'memory/'])
         
         self.config['workspace'] = workspace
-        self.config['memory_file_path'] = self.memory_file_path
+        self.config['watch_files'] = watch_files
         
         print(f"Config loaded:")
         print(f"  Cloud URL: {self.config.get('cloud_url')}")
         print(f"  Workspace: {workspace}")
-        print(f"  Memory file: {self.memory_file_path}")
+        print(f"  Watch files: {watch_files}")
     
     def initialize(self):
         """初始化组件"""
@@ -70,14 +72,30 @@ class SoulSyncPlugin:
         subscription = profile.get('subscription', {})
         print(f"Subscription: {subscription.get('status')} (days remaining: {subscription.get('daysRemaining', 0)})\n")
         
-        self.sync = OpenClawSync(self.client, self.watcher)
-        self.sync.set_memory_file(self.memory_file_path)
+        versions_file = os.path.join(os.path.dirname(__file__), '..', 'versions.json')
+        self.version_manager = VersionManager(versions_file)
         
-        print("Pulling initial memory from cloud...")
-        self.sync.pull()
+        self.profiles_client = ProfilesClient(
+            self.config.get('cloud_url'),
+            self.client.token
+        )
+        
+        self.profile_sync = ProfileSync(
+            self.profiles_client,
+            self.version_manager,
+            self.config.get('workspace')
+        )
+        
+        print("Pulling all profiles from cloud...")
+        self.profile_sync.pull_all()
         
         print("\nStarting file watcher...")
-        self.watcher = OpenClawWatcher(self.memory_file_path, self.on_file_change)
+        watch_files = self.config.get('watch_files', [])
+        self.watcher = OpenClawMultiWatcher(
+            self.config.get('workspace'),
+            watch_files,
+            self.on_file_change
+        )
         self.watcher.start()
         
         print("\nConnecting to WebSocket...")
@@ -85,30 +103,43 @@ class SoulSyncPlugin:
         
         self.running = True
     
-    def on_file_change(self, event_type: str, file_path: str = None):
+    def on_file_change(self, event_type: str, relative_path: str, absolute_path: str = None):
         """文件变化回调"""
-        print(f"\n[File {event_type}] {file_path}")
+        print(f"\n[File {event_type}] {relative_path}")
         
         if event_type in ['modified', 'created']:
             time.sleep(0.5)
             
             try:
-                self.sync.push()
-                print("Upload completed")
+                self.profile_sync.push_file(relative_path)
+                print(f"Upload completed: {relative_path}")
             except Exception as e:
                 print(f"Upload error: {e}")
+        
+        elif event_type == 'deleted':
+            print(f"File deleted (not synced to cloud): {relative_path}")
     
     def on_websocket_message(self, data: dict):
         """WebSocket 消息回调"""
         event = data.get('event')
         
-        if event == 'new_memory':
+        if event == 'file_updated':
+            file_path = data.get('file_path')
+            version = data.get('version')
+            print(f"\n[WebSocket] File updated: {file_path} (v{version})")
+            try:
+                self.profile_sync.on_remote_change(file_path, version)
+            except Exception as e:
+                print(f"Sync error: {e}")
+        
+        elif event == 'new_memory':
             print(f"\n[WebSocket] New memory available!")
             try:
-                self.sync.pull()
+                self.profile_sync.pull_all()
                 print("Memory synced from remote")
             except Exception as e:
                 print(f"Sync error: {e}")
+        
         elif data.get('type') == 'authenticated':
             print(f"[WebSocket] Authenticated, socket_id: {data.get('socket_id')}")
         elif data.get('type') == 'error':
@@ -117,7 +148,7 @@ class SoulSyncPlugin:
     def run(self):
         """运行插件"""
         print("\n" + "=" * 50)
-        print("SoulSync OpenClaw Plugin")
+        print("SoulSync OpenClaw Plugin (Multi-File Sync)")
         print("=" * 50 + "\n")
         
         try:
