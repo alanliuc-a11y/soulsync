@@ -27,5 +27,5 @@ jobs:
         working-directory: plugins/openclaw
 
       - name: Publish to npm
-        run: npm publish --provenance
+        run: npm publish --provenance --access public
         working-directory: plugins/openclaw
