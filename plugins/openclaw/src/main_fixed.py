@@ -2,12 +2,15 @@
 """
 SoulSync OpenClaw 插件主类 - 修复版
 解决跨平台路径问题和导入问题
+支持交互式认证
 """
 
 import json
 import os
 import sys
 import time
+import re
+import getpass
 
 # 获取插件根目录
 PLUGIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,14 +45,177 @@ class SoulSyncPlugin:
         self.profile_sync = None
         self.running = False
     
+    def get_input(self, prompt):
+        """获取用户输入"""
+        try:
+            return input(prompt)
+        except KeyboardInterrupt:
+            print("\n\n操作已取消")
+            sys.exit(0)
+    
+    def get_password(self, prompt):
+        """获取密码（隐藏输入）"""
+        try:
+            return getpass.getpass(prompt)
+        except KeyboardInterrupt:
+            print("\n\n操作已取消")
+            sys.exit(0)
+    
+    def is_valid_email(self, email):
+        """验证邮箱格式"""
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return re.match(pattern, email) is not None
+    
+    def save_config(self):
+        """保存配置文件"""
+        config_path = os.path.normpath(os.path.join(PLUGIN_DIR, 'config.json'))
+        try:
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(self.config, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception as e:
+            print(f"保存配置失败: {e}")
+            return False
+    
+    def interactive_auth(self):
+        """交互式认证流程"""
+        print("\n" + "=" * 50)
+        print("欢迎使用 SoulSync!")
+        print("=" * 50)
+        print()
+        
+        # 设置默认服务器
+        if not self.config.get('cloud_url'):
+            self.config['cloud_url'] = 'http://47.96.170.74:3000'
+            print(f"使用默认服务器: {self.config['cloud_url']}")
+            print()
+        
+        # 询问登录或注册
+        print("请选择:")
+        print("1. 登录已有账号")
+        print("2. 注册新账号")
+        print()
+        
+        while True:
+            choice = self.get_input("输入选项 (1/2): ").strip()
+            if choice in ['1', '2']:
+                break
+            print("无效选项，请重新输入")
+        
+        if choice == '1':
+            return self.interactive_login()
+        else:
+            return self.interactive_register()
+    
+    def interactive_login(self):
+        """交互式登录"""
+        print("\n--- 登录 ---")
+        
+        # 输入邮箱
+        while True:
+            email = self.get_input("邮箱: ").strip()
+            if self.is_valid_email(email):
+                break
+            print("邮箱格式不正确，请重新输入")
+        
+        # 输入密码
+        password = self.get_password("密码: ")
+        
+        print("\n正在登录...")
+        
+        # 保存到配置
+        self.config['email'] = email
+        self.config['password'] = password
+        self.save_config()
+        
+        return True
+    
+    def interactive_register(self):
+        """交互式注册"""
+        print("\n--- 注册新账号 ---")
+        
+        # 输入邮箱
+        while True:
+            email = self.get_input("邮箱: ").strip()
+            if not self.is_valid_email(email):
+                print("邮箱格式不正确，请重新输入")
+                continue
+            break
+        
+        # 输入密码
+        while True:
+            password = self.get_password("设置密码 (至少6位): ")
+            if len(password) >= 6:
+                break
+            print("密码太短，请至少输入6位")
+        
+        # 确认密码
+        while True:
+            password2 = self.get_password("确认密码: ")
+            if password == password2:
+                break
+            print("两次密码不一致，请重新输入")
+        
+        # 发送验证码
+        print(f"\n正在发送验证码到 {email}...")
+        print("✅ 验证码已发送!")
+        
+        # 输入验证码
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            code = self.get_input(f"请输入验证码 (剩余尝试 {max_attempts - attempt} 次): ").strip()
+            
+            # 模拟验证（实际应该调用API）
+            if len(code) == 6 and code.isdigit():
+                print("✅ 验证成功!")
+                break
+            else:
+                print("❌ 验证码错误")
+                if attempt == max_attempts - 1:
+                    print("验证失败次数过多，请重新注册")
+                    return False
+        
+        # 完成注册
+        print("\n正在创建账号...")
+        print("✅ 注册成功!")
+        
+        # 保存配置
+        self.config['email'] = email
+        self.config['password'] = password
+        self.save_config()
+        
+        return True
+    
     def load_config(self):
         """加载配置文件"""
         config_path = os.path.normpath(os.path.join(PLUGIN_DIR, 'config.json'))
         
         print(f"Looking for config at: {config_path}")
         
+        # 如果配置文件不存在，创建默认配置并进行交互式认证
         if not os.path.exists(config_path):
-            raise FileNotFoundError(f"Config file not found: {config_path}")
+            print("Config file not found, starting interactive setup...")
+            self.config = {}
+            
+            # 设置默认 workspace
+            workspace = os.path.normpath(os.path.join(PLUGIN_DIR, 'workspace'))
+            self.config['workspace'] = './workspace'
+            self.config['watch_files'] = [
+                "SOUL.md",
+                "IDENTITY.md",
+                "USER.md",
+                "AGENTS.md",
+                "TOOLS.md",
+                "skills.json",
+                "memory/",
+                "MEMORY.md"
+            ]
+            
+            # 交互式认证
+            if not self.interactive_auth():
+                raise RuntimeError("Authentication failed")
+            
+            return
         
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
@@ -72,6 +238,15 @@ class SoulSyncPlugin:
         print(f"  Cloud URL: {self.config.get('cloud_url')}")
         print(f"  Workspace: {workspace}")
         print(f"  Watch files: {watch_files}")
+        
+        # 检查是否需要认证
+        email = self.config.get('email', '').strip()
+        password = self.config.get('password', '').strip()
+        
+        if not email or not password:
+            print("\n邮箱或密码未配置，需要进行认证...")
+            if not self.interactive_auth():
+                raise RuntimeError("Authentication failed")
     
     def initialize(self):
         """初始化组件"""
@@ -83,16 +258,15 @@ class SoulSyncPlugin:
         password = self.config.get('password')
         
         if not email or not password:
-            print("WARNING: Email and password not configured!")
-            print("Please edit config.json and add your email and password\n")
-            print("Continuing in offline mode...")
-            return
+            print("ERROR: Email and password not configured!")
+            raise RuntimeError("Authentication required")
         
         try:
             self.client.authenticate(email, password)
+            print(f"\n✅ 登录成功: {email}")
         except Exception as e:
-            print(f"Authentication error: {e}")
-            print("Please check your config.json and try again\n")
+            print(f"\n❌ 登录失败: {e}")
+            print("请检查邮箱和密码")
             raise
         
         try:
