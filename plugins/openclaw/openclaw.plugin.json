@@ -1,0 +1,18 @@
+{
+  "id": "soulsync",
+  "name": "SoulSync",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "cloud_url": { "type": "string" },
+      "email": { "type": "string" },
+      "password": { "type": "string" }
+    }
+  },
+  "uiHints": {
+    "cloud_url": { "label": "服务器地址", "placeholder": "http://localhost:3000" },
+    "email": { "label": "邮箱" },
+    "password": { "label": "密码", "sensitive": true }
+  }
+}

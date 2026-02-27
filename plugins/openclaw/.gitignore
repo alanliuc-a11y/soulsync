@@ -1,0 +1,19 @@
+# 运行时生成的文件
+device_id
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+
+# 工作目录数据
+workspace/
+
+# 认证文件
+token
