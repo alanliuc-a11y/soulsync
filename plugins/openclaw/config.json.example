@@ -1,7 +1,7 @@
 {
-  "cloud_url": "http://47.96.170.74:3000",
-  "email": "你的真实邮箱",
-  "password": "你的真实密码",
+  "cloud_url": "http://your-server:3000",
+  "email": "your-email@example.com",
+  "password": "your-password",
   "workspace": "./workspace",
   "memory_file": "MEMORY.md",
   "watch_files": [
