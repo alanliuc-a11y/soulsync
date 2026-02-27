@@ -21,6 +21,10 @@ from watcher import OpenClawMultiWatcher
 from version_manager import VersionManager
 from profiles import ProfilesClient
 from sync import ProfileSync
+from interactive_auth import prompt_for_missing_config, interactive_setup, check_existing_config
+
+
+class SoulSyncPlugin:
 class SoulSyncPlugin:
     """SoulSync OpenClaw 插件主类"""
   

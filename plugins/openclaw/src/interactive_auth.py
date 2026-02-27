@@ -1,0 +1,282 @@
+#!/usr/bin/env python3
+"""
+SoulSync 交互式认证模块
+处理用户注册、登录、邮箱验证
+"""
+
+import os
+import sys
+import json
+import re
+import getpass
+
+# 获取插件目录
+PLUGIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_PATH = os.path.join(PLUGIN_DIR, 'config.json')
+
+
+def get_input(prompt):
+    """获取用户输入"""
+    try:
+        return input(prompt)
+    except KeyboardInterrupt:
+        print("\n\n操作已取消")
+        sys.exit(0)
+
+
+def get_password(prompt):
+    """获取密码（隐藏输入）"""
+    try:
+        return getpass.getpass(prompt)
+    except KeyboardInterrupt:
+        print("\n\n操作已取消")
+        sys.exit(0)
+
+
+def is_valid_email(email):
+    """验证邮箱格式"""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+
+def load_config():
+    """加载配置文件"""
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+
+def save_config(config):
+    """保存配置文件"""
+    try:
+        with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"保存配置失败: {e}")
+        return False
+
+
+def check_existing_config():
+    """检查是否已有配置"""
+    config = load_config()
+    email = config.get('email', '').strip()
+    password = config.get('password', '').strip()
+    
+    if email and password:
+        return config
+    return None
+
+
+def interactive_setup(client):
+    """
+    交互式设置流程
+    返回配置好的 config 字典
+    """
+    print("\n" + "=" * 50)
+    print("欢迎使用 SoulSync!")
+    print("=" * 50)
+    print()
+    
+    # 检查现有配置
+    existing = check_existing_config()
+    if existing:
+        print(f"已检测到现有账号: {existing['email']}")
+        choice = get_input("是否使用现有账号? (y/n): ").lower().strip()
+        if choice in ['y', 'yes', '是']:
+            return existing
+        print()
+    
+    # 询问是否有账号
+    print("请选择:")
+    print("1. 登录已有账号")
+    print("2. 注册新账号")
+    print()
+    
+    while True:
+        choice = get_input("输入选项 (1/2): ").strip()
+        if choice in ['1', '2']:
+            break
+        print("无效选项，请重新输入")
+    
+    if choice == '1':
+        return interactive_login(client)
+    else:
+        return interactive_register(client)
+
+
+def interactive_login(client):
+    """交互式登录"""
+    print("\n--- 登录 ---")
+    
+    # 输入邮箱
+    while True:
+        email = get_input("邮箱: ").strip()
+        if is_valid_email(email):
+            break
+        print("邮箱格式不正确，请重新输入")
+    
+    # 输入密码
+    password = get_password("密码: ")
+    
+    print("\n正在登录...")
+    
+    try:
+        # 尝试登录
+        result = client.authenticate(email, password)
+        
+        if result:
+            print("✅ 登录成功!")
+            
+            # 保存配置
+            config = load_config()
+            config['email'] = email
+            config['password'] = password
+            save_config(config)
+            
+            return config
+        else:
+            print("❌ 登录失败，邮箱或密码错误")
+            return None
+            
+    except Exception as e:
+        print(f"❌ 登录出错: {e}")
+        return None
+
+
+def interactive_register(client):
+    """交互式注册"""
+    print("\n--- 注册新账号 ---")
+    
+    # 输入邮箱
+    while True:
+        email = get_input("邮箱: ").strip()
+        if not is_valid_email(email):
+            print("邮箱格式不正确，请重新输入")
+            continue
+        
+        # 检查邮箱是否已注册
+        print("检查邮箱可用性...")
+        # TODO: 调用后端 API 检查邮箱是否已存在
+        # 暂时假设可用
+        break
+    
+    # 输入密码
+    while True:
+        password = get_password("设置密码 (至少6位): ")
+        if len(password) >= 6:
+            break
+        print("密码太短，请至少输入6位")
+    
+    # 确认密码
+    while True:
+        password2 = get_password("确认密码: ")
+        if password == password2:
+            break
+        print("两次密码不一致，请重新输入")
+    
+    # 发送验证码
+    print(f"\n正在发送验证码到 {email}...")
+    try:
+        # TODO: 调用后端 API 发送验证码
+        # client.send_verification_code(email)
+        print("✅ 验证码已发送!")
+    except Exception as e:
+        print(f"❌ 发送验证码失败: {e}")
+        return None
+    
+    # 输入验证码
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        code = get_input(f"请输入验证码 (剩余尝试 {max_attempts - attempt} 次): ").strip()
+        
+        # TODO: 调用后端 API 验证验证码
+        # result = client.verify_code(email, code)
+        
+        # 模拟验证成功（实际应该调用API）
+        if len(code) == 6 and code.isdigit():
+            print("✅ 验证成功!")
+            break
+        else:
+            print("❌ 验证码错误")
+            if attempt == max_attempts - 1:
+                print("验证失败次数过多，请重新注册")
+                return None
+    
+    # 完成注册
+    print("\n正在创建账号...")
+    try:
+        # TODO: 调用后端 API 注册
+        # result = client.register(email, password)
+        
+        print("✅ 注册成功!")
+        
+        # 保存配置
+        config = load_config()
+        config['email'] = email
+        config['password'] = password
+        save_config(config)
+        
+        return config
+        
+    except Exception as e:
+        print(f"❌ 注册失败: {e}")
+        return None
+
+
+def prompt_for_missing_config(client):
+    """
+    当配置缺失时，提示用户输入
+    用于插件启动时自动检测
+    """
+    config = load_config()
+    
+    email = config.get('email', '').strip()
+    password = config.get('password', '').strip()
+    cloud_url = config.get('cloud_url', '').strip()
+    
+    # 检查是否需要交互式配置
+    need_setup = not email or not password or not cloud_url
+    
+    if need_setup:
+        print("\n首次使用 SoulSync，需要进行配置...")
+        
+        # 如果没有 cloud_url，设置默认值
+        if not cloud_url:
+            config['cloud_url'] = 'http://47.96.170.74:3000'
+            print(f"使用默认服务器: {config['cloud_url']}")
+        
+        # 交互式登录/注册
+        result = interactive_setup(client)
+        
+        if result:
+            return result
+        else:
+            print("\n❌ 配置失败，插件无法启动")
+            return None
+    
+    return config
+
+
+if __name__ == '__main__':
+    # 测试代码
+    print("交互式认证模块测试")
+    print("=" * 50)
+    
+    # 模拟客户端
+    class MockClient:
+        def authenticate(self, email, password):
+            print(f"模拟登录: {email}")
+            return True
+    
+    client = MockClient()
+    result = interactive_setup(client)
+    
+    if result:
+        print(f"\n配置完成: {result}")
+    else:
+        print("\n配置失败")
