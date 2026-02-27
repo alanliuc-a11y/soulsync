@@ -56,10 +56,10 @@ SoulSync 采用**五阶段渐进式开源策略**。每个阶段完成后，前�
 | Phase | Version | Features | Open Source Timeline |
 |-------|---------|----------|---------------------|
 | **Phase 1** | v1.0.x | Basic sync, single user | After Phase 2 release |
-| **Phase 2** | v1.1.x | Multi-device, team collaboration | After Phase 3 release |
-| **Phase 3** | v1.2.x | Advanced AI features, plugins | After Phase 4 release |
-| **Phase 4** | v2.0.x | Enterprise features, API | After Phase 5 release |
-| **Phase 5** | v3.0.x | Full platform, marketplace | Fully open source |
+| **Phase 2** | v2.0.0 | Multi-bot collaboration | After Phase 3 release |
+| **Phase 3** | v3.0.0 | Singularity - AI consciousness | After Phase 4 release |
+| **Phase 4** | v4.0.0 | Fusion - Human-AI integration | After Phase 5 release |
+| **Phase 5** | v5.0.0 | Evolution - Next-gen intelligence | Fully open source |
 
 This approach ensures:
 - ✅ Sustainable development with subscription revenue
@@ -150,9 +150,11 @@ According to our [Open Source Roadmap](#open-source-roadmap--开源路线图), b
 
 根据我们的[开源路线图](#open-source-roadmap--开源路线图)，后端代码将逐步开源：
 
-- **Phase 1 code**: Available after Phase 2 release (estimated Q3 2026)
-- **Phase 2 code**: Available after Phase 3 release (estimated Q1 2027)
-- And so on...
+- **Phase 1 code**: Available after v2.0.0 release (estimated Q3 2026)
+- **Phase 2 code**: Available after v3.0.0 release (estimated Q1 2027)
+- **Phase 3 code**: Available after v4.0.0 release (estimated Q3 2027)
+- **Phase 4 code**: Available after v5.0.0 release (estimated 2028)
+- **Phase 5 code**: Fully open source
 
 If you need self-hosting immediately, please consider:
 - Supporting the project through subscription
