@@ -57,9 +57,9 @@ SoulSync 采用**五阶段渐进式开源策略**。每个阶段完成后，前�
 |-------|---------|----------|---------------------|
 | **Phase 1** | v1.0.x | Basic sync, single user | After Phase 2 release |
 | **Phase 2** | v2.0.0 | Multi-bot collaboration | After Phase 3 release |
-| **Phase 3** | v3.0.0 | Singularity | After Phase 4 release |
-| **Phase 4** | v4.0.0 | Fusion | After Phase 5 release |
-| **Phase 5** | v5.0.0 | Evolution | Fully open source |
+| **Phase 3** | v3.0.0 | "Singularity" | After Phase 4 release |
+| **Phase 4** | v4.0.0 | "Fusion" | After Phase 5 release |
+| **Phase 5** | v5.0.0 | "Evolution" | Fully open source |
 
 This approach ensures:
 - ✅ Sustainable development with subscription revenue
