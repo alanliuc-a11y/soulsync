@@ -10,47 +10,56 @@ SoulSync 是一个**跨机器人灵魂同步系统**，让你的 AI 助理（如
 - **实时同步** – 通过 WebSocket 实现即时同步
 - **多机器人支持** – 目前已支持 OpenClaw，后续将支持 CoPaw 等更多机器人
 - **订阅模式** – 7 天免费试用，之后每月 1 美元
-- **轻量易部署** – Node.js 后端 + SQLite 数据库
+- **渐进式开源** – 后端代码将在每个大阶段完成后开源
+
+## 后端服务
+
+后端服务由 SoulSync 团队官方托管和维护。用户只需安装插件，连接官方云服务即可。
+
+**当前阶段**：Phase 1 - 基础同步 (v1.0.x)
+
+**定价**：
+- 免费试用：7 天
+- 订阅费用：每月 1 美元
+
+## 开源路线图
+
+SoulSync 采用**五阶段渐进式开源策略**。每个阶段完成后，前一阶段的后端代码将开源。
+
+| 阶段 | 版本 | 功能特性 | 开源时间 |
+|------|------|----------|----------|
+| **Phase 1** | v1.0.x | 基础同步、单用户 | Phase 2 发布后 |
+| **Phase 2** | v1.1.x | 多设备、团队协作 | Phase 3 发布后 |
+| **Phase 3** | v1.2.x | 高级 AI 功能、插件系统 | Phase 4 发布后 |
+| **Phase 4** | v2.0.x | 企业功能、API | Phase 5 发布后 |
+| **Phase 5** | v3.0.x | 完整平台、应用市场 | 完全开源 |
+
+这种策略确保：
+- ✅ 通过订阅收入维持可持续开发
+- ✅ 通过渐进式透明建立社区信任
+- ✅ 为需要自托管的用户提供选择
+- ✅ 持续创新和功能开发
 
 ## 项目结构
 
 ```
 soulsync/
-├── server/              # Node.js 后端
-│   ├── src/
-│   ├── package.json
-│   └── soulsync.db      # SQLite 数据库（git 忽略）
 ├── plugins/
 │   ├── base/            # 基础类（供后续机器人使用）
-│   └── openclaw/        # OpenClaw 插件
+│   └── openclaw/        # OpenClaw 插件（本仓库）
 │       ├── src/
 │       ├── config.json.example
 │       └── requirements.txt
 └── README.md
+
+注意：后端服务代码单独维护，将根据路线图逐步开源。
 ```
 
 ## 快速开始
 
-### 1. 部署后端
+### 1. 注册账号
 
-在你的云服务器（如阿里云 ECS）上运行：
-
-```bash
-cd server
-npm install
-node src/index.js
-```
-
-生产环境建议使用 PM2：
-
-```bash
-npm install -g pm2
-pm2 start src/index.js --name soulsync
-pm2 save
-pm2 startup
-```
-
-确保防火墙/安全组中已开放 3000 端口。
+访问我们的官方网站（即将上线）注册账号，开始 7 天免费试用。
 
 ### 2. 安装 OpenClaw 插件
 
@@ -70,17 +79,32 @@ openclaw plugins install /path/to/soulsync/plugins/openclaw
 
 ```json
 {
-  "cloud_url": "http://your-server:3000",
+  "cloud_url": "http://official-server.soulsync.io:3000",
   "email": "your-email@example.com",
   "password": "your-password"
 }
 ```
+
+注意：cloud_url 指向官方 SoulSync 服务器。自托管将在对应阶段开源后可用。
 
 ### 4. 启动插件
 
 ```bash
 openclaw soulsync:start
 ```
+
+## 自托管（未来）
+
+根据我们的开源路线图，后端代码将逐步开源：
+
+- **Phase 1 代码**：Phase 2 发布后可用（预计 2026年Q3）
+- **Phase 2 代码**：Phase 3 发布后可用（预计 2027年Q1）
+- 以此类推...
+
+如果您需要立即自托管，请考虑：
+- 通过订阅支持项目
+- 参与插件开发
+- 等待对应阶段发布
 
 ## 工作原理
 

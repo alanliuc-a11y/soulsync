@@ -10,47 +10,56 @@ SoulSync is a **cross-bot soul synchronization system**. It allows your AI assis
 - **Real-time synchronization** – Changes are instantly synced via WebSocket.
 - **Multi-bot support** – Currently supports OpenClaw; more bots (CoPaw, etc.) coming soon.
 - **Subscription model** – 7-day free trial, then $1/month.
-- **Lightweight & easy to deploy** – Node.js backend + SQLite database.
+- **Progressive open source** – Backend code will be open-sourced after each major phase.
+
+## Backend Service
+
+The backend service is officially hosted and maintained by the SoulSync team. Users only need to install the plugin and connect to the official cloud service.
+
+**Current Phase**: Phase 1 - Basic sync (v1.0.x)
+
+**Pricing**:
+- Free trial: 7 days
+- Subscription: $1/month
+
+## Open Source Roadmap
+
+SoulSync follows a **5-phase progressive open-source strategy**. After each phase, the previous phase's backend code will be open-sourced.
+
+| Phase | Version | Features | Open Source Timeline |
+|-------|---------|----------|---------------------|
+| **Phase 1** | v1.0.x | Basic sync, single user | After Phase 2 release |
+| **Phase 2** | v1.1.x | Multi-device, team collaboration | After Phase 3 release |
+| **Phase 3** | v1.2.x | Advanced AI features, plugins | After Phase 4 release |
+| **Phase 4** | v2.0.x | Enterprise features, API | After Phase 5 release |
+| **Phase 5** | v3.0.x | Full platform, marketplace | Fully open source |
+
+This approach ensures:
+- ✅ Sustainable development with subscription revenue
+- ✅ Community trust through progressive transparency
+- ✅ Self-hosting option for users who need it
+- ✅ Continuous innovation and feature development
 
 ## Project Structure
 
 ```
 soulsync/
-├── server/              # Node.js backend
-│   ├── src/
-│   ├── package.json
-│   └── soulsync.db      # SQLite database (ignored by git)
 ├── plugins/
 │   ├── base/            # Base classes for future bots
-│   └── openclaw/        # OpenClaw plugin
+│   └── openclaw/        # OpenClaw plugin (this repo)
 │       ├── src/
 │       ├── config.json.example
 │       └── requirements.txt
 └── README.md
+
+Note: Backend server code is maintained separately and will be open-sourced progressively.
 ```
 
 ## Getting Started
 
-### 1. Deploy the backend
+### 1. Register account
 
-On your cloud server (e.g., Aliyun ECS), run:
-
-```bash
-cd server
-npm install
-node src/index.js
-```
-
-For production, use PM2:
-
-```bash
-npm install -g pm2
-pm2 start src/index.js --name soulsync
-pm2 save
-pm2 startup
-```
-
-Make sure port 3000 is open in your firewall / security group.
+Visit our official website (coming soon) to register an account and start your 7-day free trial.
 
 ### 2. Install the OpenClaw plugin
 
@@ -70,17 +79,32 @@ Edit `~/.openclaw/extensions/soulsync/config.json`:
 
 ```json
 {
-  "cloud_url": "http://your-server:3000",
+  "cloud_url": "http://official-server.soulsync.io:3000",
   "email": "your-email@example.com",
   "password": "your-password"
 }
 ```
+
+Note: The cloud_url points to the official SoulSync server. Self-hosting will be available after the corresponding phase is open-sourced.
 
 ### 4. Start the plugin
 
 ```bash
 openclaw soulsync:start
 ```
+
+## Self-Hosting (Future)
+
+According to our Open Source Roadmap, backend code will be progressively open-sourced:
+
+- **Phase 1 code**: Available after Phase 2 release (estimated Q3 2026)
+- **Phase 2 code**: Available after Phase 3 release (estimated Q1 2027)
+- And so on...
+
+If you need self-hosting immediately, please consider:
+- Supporting the project through subscription
+- Contributing to the plugin development
+- Waiting for the corresponding phase release
 
 ## How It Works
 

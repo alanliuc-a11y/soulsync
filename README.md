@@ -28,6 +28,55 @@ SoulSync 是一个**跨机器人灵魂同步系统**，让你的 AI 助理（如
 - **Subscription model** – 7-day free trial, then $1/month.  
   **订阅模式** – 7 天免费试用，之后每月 1 美元。
 
+- **Progressive open source** – Backend code will be open-sourced after each major phase.  
+  **渐进式开源** – 后端代码将在每个大阶段完成后开源。
+
+
+
+## Backend Service / 后端服务
+
+The backend service is officially hosted and maintained by the SoulSync team. Users only need to install the plugin and connect to the official cloud service.
+
+后端服务由 SoulSync 团队官方托管和维护。用户只需安装插件，连接官方云服务即可。
+
+**Current Phase / 当前阶段**: Phase 1 - Basic sync (v1.0.x)
+
+**Pricing / 定价**:
+- Free trial: 7 days
+- Subscription: $1/month
+
+
+
+## Open Source Roadmap / 开源路线图
+
+SoulSync follows a **5-phase progressive open-source strategy**. After each phase, the previous phase's backend code will be open-sourced.
+
+SoulSync 采用**五阶段渐进式开源策略**。每个阶段完成后，前一阶段的后端代码将开源。
+
+| Phase | Version | Features | Open Source Timeline |
+|-------|---------|----------|---------------------|
+| **Phase 1** | v1.0.x | Basic sync, single user | After Phase 2 release |
+| **Phase 2** | v1.1.x | Multi-device, team collaboration | After Phase 3 release |
+| **Phase 3** | v1.2.x | Advanced AI features, plugins | After Phase 4 release |
+| **Phase 4** | v2.0.x | Enterprise features, API | After Phase 5 release |
+| **Phase 5** | v3.0.x | Full platform, marketplace | Fully open source |
+
+This approach ensures:
+- ✅ Sustainable development with subscription revenue
+- ✅ Community trust through progressive transparency
+- ✅ Self-hosting option for users who need it
+- ✅ Continuous innovation and feature development
+
+这种策略确保：
+- ✅ 通过订阅收入维持可持续开发
+- ✅ 通过渐进式透明建立社区信任
+- ✅ 为需要自托管的用户提供选择
+- ✅ 持续创新和功能开发
+
+
+
+## Features Detail / 功能详情
+
 - **Lightweight & easy to deploy** – Node.js backend + SQLite database.  
   **轻量易部署** – Node.js 后端 + SQLite 数据库。
 
@@ -37,17 +86,16 @@ SoulSync 是一个**跨机器人灵魂同步系统**，让你的 AI 助理（如
 
 ```
 soulsync/
-├── server/              # Node.js backend
-│   ├── src/
-│   ├── package.json
-│   └── soulsync.db      # SQLite database (ignored by git)
 ├── plugins/
 │   ├── base/            # Base classes for future bots
-│   └── openclaw/        # OpenClaw plugin
+│   └── openclaw/        # OpenClaw plugin (this repo)
 │       ├── src/
 │       ├── config.json.example
 │       └── requirements.txt
 └── README.md
+
+Note: Backend server code is maintained separately and will be open-sourced progressively according to our roadmap.
+注意：后端服务代码单独维护，将根据路线图逐步开源。
 ```
 
 
@@ -56,38 +104,69 @@ soulsync/
 
 
 
-### 1. Deploy the backend / 部署后端
+### 1. Register account / 注册账号
 
+Visit our official website (coming soon) to register an account and start your 7-day free trial.
 
-
-On your cloud server (e.g., Aliyun ECS), run:
-
-在你的云服务器（如阿里云 ECS）上运行：
-
-```bash
-cd server
-npm install
-node src/index.js
-```
-
-For production, use PM2:
-
-生产环境建议使用 PM2：
-
-```bash
-npm install -g pm2
-pm2 start src/index.js --name soulsync
-pm2 save
-pm2 startup
-```
-
-Make sure port 3000 is open in your firewall / security group.
-
-确保防火墙/安全组中已开放 3000 端口。
+访问我们的官方网站（即将上线）注册账号，开始 7 天免费试用。
 
 
 
 ### 2. Install the OpenClaw plugin / 安装 OpenClaw 插件
+
+
+
+### 3. Configure the plugin / 配置插件
+
+Edit `~/.openclaw/extensions/soulsync/config.json`:
+
+编辑 `~/.openclaw/extensions/soulsync/config.json`：
+
+```json
+{
+  "cloud_url": "http://official-server.soulsync.io:3000",
+  "email": "your-email@example.com",
+  "password": "your-password"
+}
+```
+
+Note: The cloud_url points to the official SoulSync server. Self-hosting will be available after the corresponding phase is open-sourced.
+
+注意：cloud_url 指向官方 SoulSync 服务器。自托管将在对应阶段开源后可用。
+
+
+
+### 4. Start the plugin / 启动插件
+
+```bash
+openclaw soulsync:start
+```
+
+
+
+## Self-Hosting (Future) / 自托管（未来）
+
+According to our [Open Source Roadmap](#open-source-roadmap--开源路线图), backend code will be progressively open-sourced:
+
+根据我们的[开源路线图](#open-source-roadmap--开源路线图)，后端代码将逐步开源：
+
+- **Phase 1 code**: Available after Phase 2 release (estimated Q3 2026)
+- **Phase 2 code**: Available after Phase 3 release (estimated Q1 2027)
+- And so on...
+
+If you need self-hosting immediately, please consider:
+- Supporting the project through subscription
+- Contributing to the plugin development
+- Waiting for the corresponding phase release
+
+如果您需要立即自托管，请考虑：
+- 通过订阅支持项目
+- 参与插件开发
+- 等待对应阶段发布
+
+
+
+## How It Works / 工作原理
 
 ```bash
 openclaw plugins install soulsync
