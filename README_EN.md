@@ -9,7 +9,7 @@ SoulSync is a **cross-bot soul synchronization system**. It allows your AI assis
 - **Cloud-based memory storage** – All memories are stored in the cloud, accessible from anywhere.
 - **Real-time synchronization** – Changes are instantly synced via WebSocket.
 - **Multi-bot support** – Currently supports OpenClaw; more bots (CoPaw, etc.) coming soon.
-- **Subscription model** – 7-day free trial, then $1/month.
+- **Subscription model** – Free tier + paid tiers with yearly discount.
 - **Progressive open source** – Backend code will be open-sourced after each major phase.
 
 ## Backend Service
@@ -19,8 +19,15 @@ The backend service is officially hosted and maintained by the SoulSync team. Us
 **Current Phase**: Phase 1 - Basic sync (v1.0.x)
 
 **Pricing**:
-- Free trial: 7 days
-- Subscription: $1/month
+
+| Tier | Monthly | Yearly | Files |
+|------|---------|--------|-------|
+| **Free** | $0 | - | MEMORY.md, USER.md |
+| **Basic** | $1.19 | $11.9 | + IDENTITY.md, SOUL.md, TOOLS.md |
+| **Pro** | $3.99 | $39.9 | + AGENTS.md, skills.json, memory/ |
+
+- Free tier provides essential emotional connection - your bot remembers your name and preferences immediately
+- 7-day free trial for paid tiers
 
 ## Open Source Roadmap
 

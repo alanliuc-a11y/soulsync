@@ -25,8 +25,8 @@ SoulSync 是一个**跨机器人灵魂同步系统**，让你的 AI 助理（如
 - **Multi-bot support** – Currently supports OpenClaw; more bots (CoPaw, etc.) coming soon.  
   **多机器人支持** – 目前已支持 OpenClaw，后续将支持 CoPaw 等更多机器人。
 
-- **Subscription model** – 7-day free trial, then $1/month.  
-  **订阅模式** – 7 天免费试用，之后每月 1 美元。
+- **Subscription model** – Free tier + paid tiers with yearly discount.  
+  **订阅模式** – 免费版 + 付费版，年付享优惠。
 
 - **Progressive open source** – Backend code will be open-sourced after each major phase.  
   **渐进式开源** – 后端代码将在每个大阶段完成后开源。
@@ -42,8 +42,17 @@ The backend service is officially hosted and maintained by the SoulSync team. Us
 **Current Phase / 当前阶段**: Phase 1 - Basic sync (v1.0.x)
 
 **Pricing / 定价**:
-- Free trial: 7 days
-- Subscription: $1/month
+
+| Tier / 层级 | Monthly / 月付 | Yearly / 年付 | Files / 同步文件 |
+|-------------|----------------|---------------|------------------|
+| **Free / 免费** | $0 | - | MEMORY.md, USER.md |
+| **Basic / 初级** | $1.19 / ¥4.9 | $11.9 / ¥49 | + IDENTITY.md, SOUL.md, TOOLS.md |
+| **Pro / 高级** | $3.99 / ¥12.9 | $39.9 / ¥129 | + AGENTS.md, skills.json, memory/ |
+
+- Free tier provides essential emotional connection - your bot remembers your name and preferences immediately
+- 免费版提供核心的情感连接 - 你的机器人立即记得你的名字和偏好
+- 7-day free trial for paid tiers
+- 付费层级提供 7 天免费试用
 
 
 
