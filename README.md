@@ -51,8 +51,8 @@ The backend service is officially hosted and maintained by the SoulSync team. Us
 
 - Free tier provides essential emotional connection - your bot remembers your name and preferences immediately
 - 免费版提供核心的情感连接 - 你的机器人立即记得你的名字和偏好
-- 7-day free trial for paid tiers
-- 付费层级提供 7 天免费试用
+- Upgrade anytime to unlock more files
+- 随时升级解锁更多文件
 
 
 

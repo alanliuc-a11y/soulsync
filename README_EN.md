@@ -27,7 +27,7 @@ The backend service is officially hosted and maintained by the SoulSync team. Us
 | **Pro** | $3.99 | $39.9 | + AGENTS.md, skills.json, memory/ |
 
 - Free tier provides essential emotional connection - your bot remembers your name and preferences immediately
-- 7-day free trial for paid tiers
+- Upgrade anytime to unlock more files
 
 ## Open Source Roadmap
 
@@ -66,7 +66,7 @@ Note: Backend server code is maintained separately and will be open-sourced prog
 
 ### 1. Register account
 
-Visit our official website (coming soon) to register an account and start your 7-day free trial.
+Visit our official website (coming soon) to register an account. Start with the free tier and upgrade anytime.
 
 ### 2. Install the OpenClaw plugin
 
